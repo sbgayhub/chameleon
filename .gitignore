@@ -1,0 +1,7 @@
+.idea
+*.exe
+build/bin
+node_modules
+frontend/dist
+frontend/wailsjs/
+**/CLAUDE.md

@@ -1,0 +1,63 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+    themes: all;
+    root: ":root";
+    /*include: ;*/
+    /*exclude: ;*/
+    /*prefix: ;*/
+}
+
+/** {*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+/* 全局文字选择控制：默认所有元素不可选中，但排除可编辑元素 */
+body * {
+    user-select: none;
+}
+
+/* 允许选中的元素：输入框、文本区域、选择框等 - 使用!important确保覆盖 */
+input:not([readonly]),
+textarea:not([readonly]),
+select,
+[contenteditable="true"],
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+input[type="tel"] {
+    user-select: text !important;
+}
+
+/* 允许在特定场景下选中文字的元素 */
+input:not([readonly])::selection,
+textarea:not([readonly])::selection,
+select::selection,
+[contenteditable="true"]::selection {
+    background-color: hsl(var(--bc) / 0.2);
+}
+
+/* 对于代码块和错误消息等特殊元素，允许选中 */
+code,
+pre,
+.error-message,
+.alert-content {
+    user-select: text !important;
+}
+
+/* 确保DaisyUI输入组件可选中 */
+.input,
+.textarea,
+.select {
+    user-select: text !important;
+}
+
+#app {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
