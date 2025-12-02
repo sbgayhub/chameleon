@@ -45,7 +45,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install npm dependencies
         run: |
@@ -74,7 +74,7 @@ jobs:
         if: matrix.platform == 'linux' && steps.cache-wails.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config libayatana-appindicator3-dev
           for pcdir in $(pkg-config --variable pc_path pkg-config | tr ':' ' '); do
             if [ -f "$pcdir/webkit2gtk-4.1.pc" ]; then
               echo "Creating symlink in $pcdir"
@@ -89,7 +89,7 @@ jobs:
         if: matrix.platform == 'linux' && steps.cache-wails.outputs.cache-hit == 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config libayatana-appindicator3-dev
           for pcdir in $(pkg-config --variable pc_path pkg-config | tr ':' ' '); do
             if [ -f "$pcdir/webkit2gtk-4.1.pc" ]; then
               echo "Creating symlink in $pcdir"
