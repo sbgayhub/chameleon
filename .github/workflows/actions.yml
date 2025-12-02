@@ -1,4 +1,4 @@
-            - name: Wails Build Action
+- name: Wails Build Action
   # You may pin to the exact commit or the version.
   # uses: Snider/build@d0b7d7500f3344ebed78d1a59e3f183977d62d1f
   uses: Snider/build@v2.2
