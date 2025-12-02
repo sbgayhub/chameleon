@@ -11,6 +11,7 @@ require (
 	github.com/gookit/goutil v0.7.2
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/phsym/console-slog v0.3.1
+	github.com/progrium/darwinkit v0.5.0
 	github.com/samber/lo v1.52.0
 	github.com/tidwall/gjson v1.14.2
 	github.com/wailsapp/wails/v2 v2.11.0

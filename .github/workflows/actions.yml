@@ -17,7 +17,7 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: amd64
-          - os: macos-latest
+          - os: macos-13
             platform: darwin
             arch: amd64
           - os: macos-latest
@@ -140,7 +140,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           cd build/bin
-          tar -czf chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz chameleon
+          tar -czf chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz Chameleon
           mv chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz ../../
 
       - name: Package application (macOS)
@@ -148,9 +148,9 @@ jobs:
         run: |
           cd build/bin
           if [ -d "chameleon.app" ]; then
-            zip -r chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.zip "chameleon.app"
+            zip -r chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.zip "Chameleon.app"
           else
-            tar -czf chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz chameleon
+            tar -czf chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz Chameleon
           fi
           mv chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.* ../../
 
@@ -158,7 +158,7 @@ jobs:
         if: matrix.platform == 'windows'
         run: |
           cd build/bin
-          Compress-Archive -Path chameleon.exe -DestinationPath ../../chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.zip
+          Compress-Archive -Path Chameleon.exe -DestinationPath ../../chameleon-${{ steps.get_version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.zip
         shell: pwsh
 
       - name: Upload artifacts
