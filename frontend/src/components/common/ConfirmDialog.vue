@@ -6,6 +6,7 @@ const props = defineProps<{
   message: string
   confirmText?: string
   cancelText?: string
+  confirmDisabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -43,7 +44,7 @@ defineExpose({ open, close })
         <span>{{ message }}</span>
       <div class="modal-action">
         <button @click="handleCancel" class="btn">{{ cancelText || '取消' }}</button>
-        <button @click="handleConfirm" class="btn btn-primary">{{ confirmText || '确定' }}</button>
+        <button @click="handleConfirm" class="btn btn-primary" :disabled="confirmDisabled">{{ confirmText || '确定' }}</button>
       </div>
     </div>
     <div class="modal-backdrop" @click="handleCancel"></div>

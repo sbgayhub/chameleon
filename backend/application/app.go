@@ -18,6 +18,7 @@ import (
 	"github.com/sbgayhub/chameleon/backend/server"
 	"github.com/sbgayhub/chameleon/backend/statistics"
 	"github.com/sbgayhub/chameleon/backend/tray"
+	"github.com/sbgayhub/chameleon/backend/updater"
 	"github.com/wailsapp/wails/v2/pkg/options"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -45,6 +46,7 @@ type App struct {
 	TrayMgr    *tray.Manager
 	StatsMgr   *statistics.Manager
 	CertMgr    *certificate.CertManager
+	UpdateMgr  *updater.Manager
 
 	Server server.Server
 
@@ -97,6 +99,7 @@ func NewApp() *App {
 		ConfigMgr:  configMgr,
 		ChannelMgr: channelMgr,
 		StatsMgr:   statsMgr,
+		UpdateMgr:  updater.NewManager(),
 		running:    false,
 	}
 }
@@ -131,6 +134,11 @@ func (app *App) Startup(ctx context.Context) {
 	anthropic.RegistryAnthropicConverter()
 	openai.RegistryOpenAIConverter()
 	openai.RegistryAnthropicConverter()
+
+	// 启动时检查更新
+	if app.ConfigMgr.GetConfig().General.CheckOnStartup {
+		go app.UpdateMgr.CheckUpdateOnStartup(ctx, app.ConfigMgr.GetConfig().General.AutoUpdate)
+	}
 
 	slog.Info("app start")
 }

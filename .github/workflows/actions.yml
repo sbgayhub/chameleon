@@ -127,13 +127,15 @@ jobs:
             echo "CGO_CFLAGS: $CGO_CFLAGS"
             echo "CGO_LDFLAGS: $CGO_LDFLAGS"
           fi
-          wails build -platform ${{ matrix.platform }}/${{ matrix.arch }}
+          VERSION=$(grep -o '"productVersion": *"[^"]*"' wails.json | cut -d'"' -f4)
+          wails build -platform ${{ matrix.platform }}/${{ matrix.arch }} -ldflags "-X github.com/sbgayhub/chameleon/backend/updater.Version=$VERSION"
 
       - name: Build application (Windows)
         if: matrix.platform == 'windows'
         run: |
           $env:PATH += ";$(go env GOPATH)\bin"
-          wails build -platform ${{ matrix.platform }}/${{ matrix.arch }}
+          $VERSION = (Get-Content wails.json | ConvertFrom-Json).info.productVersion
+          wails build -platform ${{ matrix.platform }}/${{ matrix.arch }} -ldflags "-X github.com/sbgayhub/chameleon/backend/updater.Version=$VERSION"
         shell: pwsh
 
       - name: Package application (Linux)

@@ -31,6 +31,7 @@ func main() {
 			app.ConfigMgr,
 			app.ChannelMgr,
 			app.StatsMgr,
+			app.UpdateMgr,
 		},
 		StartHidden: app.ConfigMgr.GetConfig().General.StartMinimized,
 		SingleInstanceLock: &options.SingleInstanceLock{

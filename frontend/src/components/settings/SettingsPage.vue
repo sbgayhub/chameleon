@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import {
   GetConfig,
   UpdateGeneralConfig,
@@ -8,8 +8,9 @@ import {
   UpdateUIConfig
 } from '../../../wailsjs/go/config/Manager'
 import {Uninstall} from "../../../wailsjs/go/certificate/CertManager"
+import {CheckUpdate, DoUpdate, GetVersion} from "../../../wailsjs/go/updater/Manager"
 import {config} from '../../../wailsjs/go/models'
-import {BrowserOpenURL} from '../../../wailsjs/runtime/runtime'
+import {BrowserOpenURL, EventsOn, EventsOff} from '../../../wailsjs/runtime/runtime'
 import ConfirmDialog from '../common/ConfirmDialog.vue'
 
 const configData = ref<config.Config | null>(null)
@@ -17,6 +18,13 @@ const loading = ref(false)
 const error = ref('')
 const success = ref('')
 const confirmDialog = ref<InstanceType<typeof ConfirmDialog> | null>(null)
+const updateDialog = ref<InstanceType<typeof ConfirmDialog> | null>(null)
+
+// 更新相关状态
+const currentVersion = ref('dev')
+const checkingUpdate = ref(false)
+const updating = ref(false)
+const updateInfo = ref<{hasUpdate: boolean, latestVersion: string, releaseNotes: string} | null>(null)
 
 // 加载配置
 const loadConfig = async () => {
@@ -93,8 +101,63 @@ const cleanHost = () => {
   alert('此功能正在开发中')
 }
 
-onMounted(() => {
+// 手动检查更新
+const handleCheckUpdate = async () => {
+  checkingUpdate.value = true
+  error.value = ''
+  try {
+    const info = await CheckUpdate()
+    updateInfo.value = info
+    if (info.hasUpdate) {
+      updateDialog.value?.open()
+    } else {
+      success.value = '当前已是最新版本'
+      setTimeout(() => success.value = '', 3000)
+    }
+  } catch (err) {
+    error.value = `检查更新失败: ${err}`
+  } finally {
+    checkingUpdate.value = false
+  }
+}
+
+// 执行更新
+const handleDoUpdate = async () => {
+  updating.value = true
+  error.value = ''
+  try {
+    const updated = await DoUpdate()
+    if (updated) {
+      success.value = '更新完成，请重启应用以应用更新'
+    }
+  } catch (err) {
+    error.value = `更新失败: ${err}`
+  } finally {
+    updating.value = false
+  }
+}
+
+onMounted(async () => {
   loadConfig()
+  currentVersion.value = await GetVersion()
+
+  // 监听更新事件
+  EventsOn('update_available', (info: any) => {
+    updateInfo.value = info
+    updateDialog.value?.open()
+  })
+  EventsOn('update_completed', (msg: string) => {
+    success.value = msg
+  })
+  EventsOn('update_error', (msg: string) => {
+    error.value = msg
+  })
+})
+
+onUnmounted(() => {
+  EventsOff('update_available')
+  EventsOff('update_completed')
+  EventsOff('update_error')
 })
 </script>
 
@@ -263,6 +326,45 @@ onMounted(() => {
                 <option value="en-US">English</option>
               </select>
             </div>
+
+            <div class="divider my-2">更新设置</div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">启用自动更新</span>
+                <span class="label-text-alt text-base-content/50">有更新时自动下载安装</span>
+              </label>
+              <input
+                  v-model="configData.General!.AutoUpdate"
+                  type="checkbox"
+                  class="toggle toggle-primary float-right"
+              />
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">启动时检查更新</span>
+              </label>
+              <input
+                  v-model="configData.General!.CheckOnStartup"
+                  type="checkbox"
+                  class="toggle toggle-primary float-right"
+              />
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">手动检查更新</span>
+              </label>
+              <button
+                  @click="handleCheckUpdate"
+                  class="btn btn-sm btn-outline float-right"
+                  :disabled="checkingUpdate"
+              >
+                <span v-if="checkingUpdate" class="loading loading-spinner loading-xs"></span>
+                {{ checkingUpdate ? '检查中...' : '检查更新' }}
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -339,7 +441,7 @@ onMounted(() => {
                 </div>
                 <div>
                   <h4 class="text-xl font-bold">Chameleon</h4>
-                  <p class="text-sm text-base-content/60">版本 v1.0.0</p>
+                  <p class="text-sm text-base-content/60">版本 {{ currentVersion }}</p>
                 </div>
               </div>
               <button @click="BrowserOpenURL('https://github.com/sbgayhub')" class="btn btn-outline gap-2">
@@ -375,6 +477,17 @@ onMounted(() => {
         confirm-text="卸载"
         cancel-text="取消"
         @confirm="handleUninstallConfirm"
+    />
+
+    <!-- 更新确认对话框 -->
+    <ConfirmDialog
+        ref="updateDialog"
+        title="发现新版本"
+        :message="`发现新版本 ${updateInfo?.latestVersion || ''}，当前版本 ${currentVersion}。是否立即更新？`"
+        :confirm-text="updating ? '更新中...' : '立即更新'"
+        cancel-text="稍后再说"
+        :confirm-disabled="updating"
+        @confirm="handleDoUpdate"
     />
   </div>
 </template>

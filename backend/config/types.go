@@ -17,10 +17,11 @@ type ProxyConfig struct {
 
 // GeneralConfig 通用配置
 type GeneralConfig struct {
-	AutoStart      bool `toml:"auto_start" comment:"开机自动启动"`     // 自动启动
-	StartMinimized bool `toml:"start_minimized" comment:"最小化启动"` // 最小化启动
-	//StartAsAdmin   bool   `toml:"start_as_admin" comment:"以管理员权限启动"`             // 以管理员权限启动
-	CloseAction string `toml:"close_action" comment:"关闭动作：ask|minimize|exit"` // 关闭动作
+	AutoStart      bool   `toml:"auto_start" comment:"开机自动启动"`                   // 自动启动
+	StartMinimized bool   `toml:"start_minimized" comment:"最小化启动"`               // 最小化启动
+	CloseAction    string `toml:"close_action" comment:"关闭动作：ask|minimize|exit"` // 关闭动作
+	AutoUpdate     bool   `toml:"auto_update" comment:"启用自动更新"`                  // 自动更新
+	CheckOnStartup bool   `toml:"check_on_startup" comment:"启动时检查更新"`            // 启动时检查更新
 }
 
 // UIConfig UI配置
@@ -51,7 +52,8 @@ func getDefaultConfig() *Config {
 			AutoStart:      false,
 			StartMinimized: false,
 			CloseAction:    "ask",
-			//StartAsAdmin:   false,
+			AutoUpdate:     false,
+			CheckOnStartup: true,
 		},
 		UI: &UIConfig{
 			Language: "zh-CN",
